@@ -1,6 +1,6 @@
 namespace OrderFlow.Api.Application.DTOs.Clientes;
 
-public class CriarClienteDTO
+public class CriarClienteDto
 {
     public string Nome { get; set; } = string.Empty;
 
