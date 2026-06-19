@@ -26,7 +26,6 @@ public class ClienteService
             Nome = dto.Nome.Trim(),
             Email = dto.Email.Trim(),
             Telefone = dto.Telefone.Trim(),
-            DateTime = DateTime.Now
         };
 
         return await _clienteRepository.CriarAsync(cliente);
