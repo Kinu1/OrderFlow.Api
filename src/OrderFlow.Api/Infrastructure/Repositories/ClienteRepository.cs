@@ -11,6 +11,7 @@ public class ClienteRepository : IClienteRepository
     public Task<int> CriarAsync(Cliente cliente)
     {
         cliente.Id = _proximoId++;
+        cliente.DateTime = DateTime.Now;
 
         Clientes.Add(cliente);
 
