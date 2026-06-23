@@ -27,7 +27,7 @@ public class ProdutoService
         var produto = new Produto
         {
             Nome = dto.Nome.Trim(),
-            Descricao = dto.Descricao.Trim(),
+            Descricao = dto.Descricao.Trim() ?? string.Empty,
             Preco = dto.Preco,
             Estoque = dto.Estoque,
             Ativo = true
@@ -94,7 +94,7 @@ public class ProdutoService
             return false;
 
         produtoExistente.Nome = dto.Nome.Trim();
-        produtoExistente.Descricao = dto.Descricao.Trim();
+        produtoExistente.Descricao = dto.Descricao.Trim() ?? string.Empty;
         produtoExistente.Preco = dto.Preco;
         produtoExistente.Estoque = dto.Estoque;
 
