@@ -43,6 +43,7 @@ BEGIN
         Ativo,
         CriadoEm
     FROM Produtos
+    WHERE Ativo = 1
     ORDER BY Id DESC;
 END;
 GO
@@ -97,6 +98,7 @@ BEGIN
     UPDATE Produtos
     SET Ativo = 0
     WHERE Id = @Id;
+        AND Ativo = 1;
 
     SELECT @@ROWCOUNT AS LinhasAfetadas;
 END;
