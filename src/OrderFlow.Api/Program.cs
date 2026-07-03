@@ -15,6 +15,9 @@ builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 
+builder.Services.AddScoped<PedidoService>();
+builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
