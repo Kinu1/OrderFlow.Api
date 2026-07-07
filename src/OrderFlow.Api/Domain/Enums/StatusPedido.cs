@@ -1,4 +1,4 @@
-namespace OrderFlow.Api.Domain;
+namespace OrderFlow.Api.Domain.Enums;
 
 public enum StatusPedido
 {
