@@ -1,3 +1,5 @@
+using OrderFlow.Api.Domain.Enums;
+
 namespace OrderFlow.Api.Domain.Entities;
 
 public class Pedido

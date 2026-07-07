@@ -1,7 +1,9 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
+using OrderFlow.Api.Application.DTOs.Pedidos;
 using OrderFlow.Api.Application.Interfaces;
 using OrderFlow.Api.Domain.Entities;
+using OrderFlow.Api.Domain.Enums;
 using OrderFlow.Api.Infrastructure.Data;
 
 namespace OrderFlow.Api.Infrastructure.Repositories;
@@ -34,6 +36,49 @@ public class PedidoRepository : IPedidoRepository
 
         return Convert.ToInt32(resultado);
     }
+    
+    public async Task<PedidoResponseDto?> ObterPorIdAsync(int id)
+{
+    await using var conexao = _connectionFactory.CreateConnection();
+
+    await using var comando = new SqlCommand("Pedido_ObterPorId", conexao);
+    comando.CommandType = CommandType.StoredProcedure;
+
+    comando.Parameters.AddWithValue("@Id", id);
+
+    await conexao.OpenAsync();
+
+    await using var reader = await comando.ExecuteReaderAsync();
+
+    if (!await reader.ReadAsync())
+        return null;
+
+    var pedido = new PedidoResponseDto
+    {
+        Id = reader.GetInt32(reader.GetOrdinal("Id")),
+        ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+        CriadoEm = reader.GetDateTime(reader.GetOrdinal("CriadoEm")),
+        Total = reader.GetDecimal(reader.GetOrdinal("Total")),
+        Status = (StatusPedido)reader.GetInt32(reader.GetOrdinal("Status"))
+    };
+
+    await reader.NextResultAsync();
+
+    while (await reader.ReadAsync())
+    {
+        pedido.Itens.Add(new ItemPedidoResponseDto
+        {
+            ProdutoId = reader.GetInt32(reader.GetOrdinal("ProdutoId")),
+            ProdutoNome = reader.GetString(reader.GetOrdinal("ProdutoNome")),
+            Quantidade = reader.GetInt32(reader.GetOrdinal("Quantidade")),
+            PrecoUnitario = reader.GetDecimal(reader.GetOrdinal("PrecoUnitario")),
+            SubTotal = reader.GetDecimal(reader.GetOrdinal("Subtotal"))
+        });
+    }
+
+    return pedido;
+}
+    
 
     private static DataTable CriarTabelaItens(List<ItemPedido> itens)
     {
