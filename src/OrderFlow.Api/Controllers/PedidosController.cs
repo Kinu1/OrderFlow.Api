@@ -35,4 +35,12 @@ public class PedidosController : ControllerBase
             return BadRequest(new { mensagem = ex.Message });
         }
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Listar()
+    {
+        var pedidos = await _pedidoservice.ListarAsync();
+
+        return Ok(pedidos);
+    }
 }

@@ -13,6 +13,11 @@ public class PedidoService
         _pedidoRepository = pedidoRepository;
     }
 
+    public async Task<List<PedidoResumoDto>> ListarAsync()
+    {
+        return await _pedidoRepository.ListarAsync();
+    }
+
     public async Task<int> CriarAsync(CriarPedidoDto dto)
     {
         if (dto.ClienteId <= 0)
@@ -46,4 +51,5 @@ public class PedidoService
 
         return await _pedidoRepository.CriarAsync(pedido);
     }
+    
 }
