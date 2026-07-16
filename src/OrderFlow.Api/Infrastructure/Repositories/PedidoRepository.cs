@@ -36,49 +36,49 @@ public class PedidoRepository : IPedidoRepository
 
         return Convert.ToInt32(resultado);
     }
-    
+
     public async Task<PedidoResponseDto?> ObterPorIdAsync(int id)
-{
-    await using var conexao = _connectionFactory.CreateConnection();
-
-    await using var comando = new SqlCommand("Pedido_ObterPorId", conexao);
-    comando.CommandType = CommandType.StoredProcedure;
-
-    comando.Parameters.AddWithValue("@Id", id);
-
-    await conexao.OpenAsync();
-
-    await using var reader = await comando.ExecuteReaderAsync();
-
-    if (!await reader.ReadAsync())
-        return null;
-
-    var pedido = new PedidoResponseDto
     {
-        Id = reader.GetInt32(reader.GetOrdinal("Id")),
-        ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
-        CriadoEm = reader.GetDateTime(reader.GetOrdinal("CriadoEm")),
-        Total = reader.GetDecimal(reader.GetOrdinal("Total")),
-        Status = (StatusPedido)reader.GetInt32(reader.GetOrdinal("Status"))
-    };
+        await using var conexao = _connectionFactory.CreateConnection();
 
-    await reader.NextResultAsync();
+        await using var comando = new SqlCommand("Pedido_ObterPorId", conexao);
+        comando.CommandType = CommandType.StoredProcedure;
 
-    while (await reader.ReadAsync())
-    {
-        pedido.Itens.Add(new ItemPedidoResponseDto
+        comando.Parameters.AddWithValue("@Id", id);
+
+        await conexao.OpenAsync();
+
+        await using var reader = await comando.ExecuteReaderAsync();
+
+        if (!await reader.ReadAsync())
+            return null;
+
+        var pedido = new PedidoResponseDto
         {
-            ProdutoId = reader.GetInt32(reader.GetOrdinal("ProdutoId")),
-            ProdutoNome = reader.GetString(reader.GetOrdinal("ProdutoNome")),
-            Quantidade = reader.GetInt32(reader.GetOrdinal("Quantidade")),
-            PrecoUnitario = reader.GetDecimal(reader.GetOrdinal("PrecoUnitario")),
-            SubTotal = reader.GetDecimal(reader.GetOrdinal("Subtotal"))
-        });
+            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+            ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+            CriadoEm = reader.GetDateTime(reader.GetOrdinal("CriadoEm")),
+            Total = reader.GetDecimal(reader.GetOrdinal("Total")),
+            Status = (StatusPedido)reader.GetInt32(reader.GetOrdinal("Status"))
+        };
+
+        await reader.NextResultAsync();
+
+        while (await reader.ReadAsync())
+        {
+            pedido.Itens.Add(new ItemPedidoResponseDto
+            {
+                ProdutoId = reader.GetInt32(reader.GetOrdinal("ProdutoId")),
+                ProdutoNome = reader.GetString(reader.GetOrdinal("ProdutoNome")),
+                Quantidade = reader.GetInt32(reader.GetOrdinal("Quantidade")),
+                PrecoUnitario = reader.GetDecimal(reader.GetOrdinal("PrecoUnitario")),
+                SubTotal = reader.GetDecimal(reader.GetOrdinal("Subtotal"))
+            });
+        }
+
+        return pedido;
     }
 
-    return pedido;
-}
-    
 
     private static DataTable CriarTabelaItens(List<ItemPedido> itens)
     {
@@ -93,5 +93,34 @@ public class PedidoRepository : IPedidoRepository
         }
 
         return tabela;
+    }
+
+    public async Task<List<PedidoResumoDto>> ListarAsync()
+    {
+        var pedidos = new List<PedidoResumoDto>();
+
+        await using var conexao = _connectionFactory.CreateConnection();
+
+        await using var comando = new SqlCommand("Pedido_Listar", conexao);
+        comando.CommandType = CommandType.StoredProcedure;
+
+        await conexao.OpenAsync();
+
+        await using var reader = await comando.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            pedidos.Add(new PedidoResumoDto
+            {
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+                ClienteNome = reader.GetString(reader.GetOrdinal("ClienteNome")),
+                CriadoEm = reader.GetDateTime(reader.GetOrdinal("CriadoEm")),
+                Total = reader.GetDecimal(reader.GetOrdinal("Total")),
+                Status = (StatusPedido)reader.GetInt32(reader.GetOrdinal("Status"))
+            });
+        }
+
+        return pedidos;
     }
 }
