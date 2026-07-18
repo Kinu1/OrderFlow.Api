@@ -7,7 +7,9 @@ public interface IPedidoRepository
 {
     Task<int> CriarAsync(Pedido pedido);
 
+    Task<List<PedidoResumoDto>> ListarAsync();
+
     Task<PedidoResponseDto?> ObterPorIdAsync(int id);
 
-    Task<List<PedidoResumoDto>> ListarAsync();
+    Task<bool> CancelarAsync(int id);
 }

@@ -123,4 +123,22 @@ public class PedidoRepository : IPedidoRepository
 
         return pedidos;
     }
+
+    public async Task<bool> CancelarAsync(int id)
+    {
+         await using var conexao = _connectionFactory.CreateConnection();
+
+         await using var comando = new SqlCommand("Pedido_Cancelar", conexao);
+         comando.CommandType = CommandType.StoredProcedure;
+
+         comando.Parameters.AddWithValue("@Id", id);
+
+         await conexao.OpenAsync();
+
+         var resultado = await comando.ExecuteScalarAsync();
+
+         var sucesso = Convert.ToInt32(resultado);
+
+         return sucesso == 1;
+    }
 }
