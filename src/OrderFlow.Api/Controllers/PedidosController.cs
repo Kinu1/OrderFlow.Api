@@ -43,4 +43,23 @@ public class PedidosController : ControllerBase
 
         return Ok(pedidos);
     }
+
+    [HttpPut("{id:int}/cancelar")]
+    public async Task<IActionResult> Cancelar(int id)
+    {
+        try
+        {
+            await _pedidoservice.CancelarAsync(id);
+
+            return NoContent();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { mensagem = ex.Message });
+        }
+        catch (SqlException ex)
+        {
+            return BadRequest(new { mensagem = ex.Message });
+        }
+    }
 }
