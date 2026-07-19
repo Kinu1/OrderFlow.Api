@@ -37,7 +37,12 @@ public class ProdutosController : ControllerBase
         var produto = await _produtoService.ObterPorIdAsync(id);
 
         if (produto is null)
-            return NotFound(new { mensagem = "Produto não encontrado." });
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Produto não encontrado."
+
+            });
 
         return Ok(produto);
     }
@@ -48,7 +53,12 @@ public class ProdutosController : ControllerBase
         var atualizado = await _produtoService.AtualizarAsync(id, dto);
 
         if (!atualizado)
-            return NotFound(new { mensagem = "Produto não encontrado." });
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Produto não encontrado."
+
+            });
 
         return NoContent();
     }
@@ -59,7 +69,12 @@ public class ProdutosController : ControllerBase
         var desativado = await _produtoService.DesativarAsync(id);
 
         if (!desativado)
-            return NotFound(new { mensagem = "Produto não encontrado." });
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Produto não encontrado."
+
+            });
 
         return NoContent();
     }

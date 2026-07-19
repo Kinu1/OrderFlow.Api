@@ -32,9 +32,24 @@ public class ExceptionMiddleware
         }
         catch (SqlException ex)
         {
+            var statusCode = ObterStatusCodeSql(ex);
+
+            if (statusCode == HttpStatusCode.InternalServerError)
+            {
+                _logger.LogError(ex, "Erro inesperado no SQL Server.");
+
+                await HandleExceptionAsync(
+                    context,
+                    statusCode,
+                    "Ocorreu um erro ao acessar o banco de dados."
+                );
+
+                return;
+            }
+
             await HandleExceptionAsync(
                 context,
-                HttpStatusCode.BadRequest,
+                statusCode,
                 ex.Message
             );
         }
@@ -48,6 +63,23 @@ public class ExceptionMiddleware
                 "Ocorreu um erro interno no servidor."
             );
         }
+    }
+
+    private static HttpStatusCode ObterStatusCodeSql(SqlException ex)
+    {
+        return ex.Number switch
+        {
+            50001 => HttpStatusCode.NotFound,
+            50003 => HttpStatusCode.NotFound,
+            50010 => HttpStatusCode.NotFound,
+
+            50002 => HttpStatusCode.BadRequest,
+            50004 => HttpStatusCode.BadRequest,
+            50005 => HttpStatusCode.BadRequest,
+            50011 => HttpStatusCode.BadRequest,
+
+            _ => HttpStatusCode.InternalServerError
+        };
     }
 
     private static async Task HandleExceptionAsync(

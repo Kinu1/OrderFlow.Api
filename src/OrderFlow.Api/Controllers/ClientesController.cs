@@ -37,7 +37,11 @@ public class ClientesController : ControllerBase
         var cliente = await _clienteService.ObterPorIdAsync(id);
 
         if (cliente is null)
-            return NotFound(new { mensagem = "Cliente não encontrado." });
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Cliente não encontrado."
+            }); 
 
         return Ok(cliente);
     }
@@ -48,7 +52,12 @@ public class ClientesController : ControllerBase
         var atualizado = await _clienteService.AtualizarAsync(id, dto);
 
         if (!atualizado)
-            return NotFound(new { mensagem = "Cliente não encontrado." });
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Cliente não encontrado."
+
+            });
 
         return NoContent();
     }
@@ -59,7 +68,12 @@ public class ClientesController : ControllerBase
         var excluido = await _clienteService.ExcluirAsync(id);
 
         if (!excluido)
-            return NotFound(new { mensagem = "Cliente não encontrado." });
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Cliente não encontrado."
+
+            });
 
         return NoContent();
     }

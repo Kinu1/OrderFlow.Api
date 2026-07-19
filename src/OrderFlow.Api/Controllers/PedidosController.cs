@@ -37,7 +37,12 @@ public class PedidosController : ControllerBase
         var pedido = await _pedidoService.ObterPorIdAsync(id);
 
         if (pedido is null)
-            return NotFound(new { mensagem = "Pedido não encontrado." });
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Pedido não encontrado."
+
+            });
 
         return Ok(pedido);
     }
