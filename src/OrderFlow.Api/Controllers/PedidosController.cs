@@ -54,4 +54,13 @@ public class PedidosController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id:int}/confirmar")]
+    public async Task<IActionResult> Confirmar(int id)
+    {
+        await _pedidoService.ConfirmarAsync(id);
+
+        return NoContent();
+
+    }
 }

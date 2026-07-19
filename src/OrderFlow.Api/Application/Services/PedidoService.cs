@@ -54,10 +54,10 @@ public class PedidoService
 
     public async Task<PedidoResponseDto?> ObterPorIdAsync(int id)
     {
-    if (id <= 0)
-        throw new ArgumentException("O ID do pedido deve ser maior que zero.");
+        if (id <= 0)
+            throw new ArgumentException("O ID do pedido deve ser maior que zero.");
 
-    return await _pedidoRepository.ObterPorIdAsync(id);
+        return await _pedidoRepository.ObterPorIdAsync(id);
     }
 
     public async Task<bool> CancelarAsync(int id)
@@ -66,5 +66,14 @@ public class PedidoService
             throw new ArgumentException("O ID do pedido deve ser maior que zero.");
 
         return await _pedidoRepository.CancelarAsync(id);
+    }
+
+    public async Task<bool> ConfirmarAsync(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("O ID do pedido deve ser maior que zero.");
+
+        return await _pedidoRepository.ConfirmarAsync(id);
+
     }  
 }

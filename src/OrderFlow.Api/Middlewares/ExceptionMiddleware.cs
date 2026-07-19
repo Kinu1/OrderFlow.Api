@@ -77,9 +77,12 @@ public class ExceptionMiddleware
             50004 => HttpStatusCode.BadRequest,
             50005 => HttpStatusCode.BadRequest,
             50011 => HttpStatusCode.BadRequest,
+            50012 => HttpStatusCode.BadRequest,
+            50013 => HttpStatusCode.BadRequest,
 
             _ => HttpStatusCode.InternalServerError
         };
+
     }
 
     private static async Task HandleExceptionAsync(
