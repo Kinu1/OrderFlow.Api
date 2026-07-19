@@ -126,19 +126,38 @@ public class PedidoRepository : IPedidoRepository
 
     public async Task<bool> CancelarAsync(int id)
     {
-         await using var conexao = _connectionFactory.CreateConnection();
+        await using var conexao = _connectionFactory.CreateConnection();
 
-         await using var comando = new SqlCommand("Pedido_Cancelar", conexao);
-         comando.CommandType = CommandType.StoredProcedure;
+        await using var comando = new SqlCommand("Pedido_Cancelar", conexao);
+        comando.CommandType = CommandType.StoredProcedure;
 
-         comando.Parameters.AddWithValue("@Id", id);
+        comando.Parameters.AddWithValue("@Id", id);
 
-         await conexao.OpenAsync();
+        await conexao.OpenAsync();
 
-         var resultado = await comando.ExecuteScalarAsync();
+        var resultado = await comando.ExecuteScalarAsync();
 
-         var sucesso = Convert.ToInt32(resultado);
+        var sucesso = Convert.ToInt32(resultado);
 
-         return sucesso == 1;
+        return sucesso == 1;
+    }
+
+    public async Task<bool> ConfirmarAsync(int id)
+    {
+        await using var conexao = _connectionFactory.CreateConnection();
+
+        await using var comando = new SqlCommand("Pedido_Confirmar", conexao);
+        comando.CommandType = CommandType.StoredProcedure;
+
+        comando.Parameters.AddWithValue("@Id", id);
+
+        await conexao.OpenAsync();
+
+        var resultado = await comando.ExecuteScalarAsync();
+
+        var sucesso = Convert.ToInt32(resultado);
+
+        return sucesso == 1;
+
     }
 }

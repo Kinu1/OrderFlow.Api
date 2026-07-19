@@ -2,6 +2,7 @@ using OrderFlow.Api.Application.Interfaces;
 using OrderFlow.Api.Application.Services;
 using OrderFlow.Api.Infrastructure.Data;
 using OrderFlow.Api.Infrastructure.Repositories;
+using OrderFlow.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

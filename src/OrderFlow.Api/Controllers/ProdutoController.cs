@@ -18,16 +18,9 @@ public class ProdutosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Criar(CriarProdutoDto dto)
     {
-        try
-        {
-            var id = await _produtoService.CriarAsync(dto);
+        var id = await _produtoService.CriarAsync(dto);
 
-            return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
+        return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
     }
 
     [HttpGet]
@@ -41,54 +34,48 @@ public class ProdutosController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> ObterPorId(int id)
     {
-        try
-        {
-            var produto = await _produtoService.ObterPorIdAsync(id);
+        var produto = await _produtoService.ObterPorIdAsync(id);
 
-            if (produto is null)
-                return NotFound(new { mensagem = "Produto não encontrado." });
+        if (produto is null)
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Produto não encontrado."
 
-            return Ok(produto);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
+            });
+
+        return Ok(produto);
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Atualizar(int id, CriarProdutoDto dto)
     {
-        try
-        {
-            var atualizado = await _produtoService.AtualizarAsync(id, dto);
+        var atualizado = await _produtoService.AtualizarAsync(id, dto);
 
-            if (!atualizado)
-                return NotFound(new { mensagem = "Produto não encontrado." });
+        if (!atualizado)
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Produto não encontrado."
 
-            return NoContent();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
+            });
+
+        return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Desativar(int id)
     {
-        try
-        {
-            var desativado = await _produtoService.DesativarAsync(id);
+        var desativado = await _produtoService.DesativarAsync(id);
 
-            if (!desativado)
-                return NotFound(new { mensagem = "Produto não encontrado." });
+        if (!desativado)
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Produto não encontrado."
 
-            return NoContent();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
+            });
+
+        return NoContent();
     }
 }

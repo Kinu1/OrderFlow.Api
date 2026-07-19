@@ -12,4 +12,6 @@ public interface IPedidoRepository
     Task<PedidoResponseDto?> ObterPorIdAsync(int id);
 
     Task<bool> CancelarAsync(int id);
+
+    Task<bool> ConfirmarAsync(int id);
 }

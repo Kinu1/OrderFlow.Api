@@ -1,65 +1,66 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using OrderFlow.Api.Application.DTOs.Pedidos;
 using OrderFlow.Api.Application.Services;
 
 namespace OrderFlow.Api.Controllers;
 
 [ApiController]
-[Route("api/[Controller]")]
+[Route("api/[controller]")]
 public class PedidosController : ControllerBase
 {
-    private readonly PedidoService _pedidoservice;
+    private readonly PedidoService _pedidoService;
 
     public PedidosController(PedidoService pedidoService)
     {
-        _pedidoservice = pedidoService;
+        _pedidoService = pedidoService;
     }
 
     [HttpPost]
     public async Task<IActionResult> Criar(CriarPedidoDto dto)
     {
-        try
-        {
-            var id = await _pedidoservice.CriarAsync(dto);
+        var id = await _pedidoService.CriarAsync(dto);
 
-            return Created($"/api/pedidos/{id}", new { id });
-        }
-
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
-        catch (SqlException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
+        return Created($"/api/pedidos/{id}", new { id });
     }
 
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        var pedidos = await _pedidoservice.ListarAsync();
+        var pedidos = await _pedidoService.ListarAsync();
 
         return Ok(pedidos);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> ObterPorId(int id)
+    {
+        var pedido = await _pedidoService.ObterPorIdAsync(id);
+
+        if (pedido is null)
+            return NotFound(new
+            {
+                statusCode = 404,
+                mensagem = "Pedido não encontrado."
+
+            });
+
+        return Ok(pedido);
     }
 
     [HttpPut("{id:int}/cancelar")]
     public async Task<IActionResult> Cancelar(int id)
     {
-        try
-        {
-            await _pedidoservice.CancelarAsync(id);
+        await _pedidoService.CancelarAsync(id);
 
-            return NoContent();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
-        catch (SqlException ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
+        return NoContent();
+    }
+
+    [HttpPut("{id:int}/confirmar")]
+    public async Task<IActionResult> Confirmar(int id)
+    {
+        await _pedidoService.ConfirmarAsync(id);
+
+        return NoContent();
+
     }
 }
