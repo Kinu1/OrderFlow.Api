@@ -5,6 +5,8 @@ using OrderFlow.Api.Infrastructure.Repositories;
 using OrderFlow.Api.Middlewares;
 using System.Text.Json.Serialization;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using OrderFlow.Api.Application.DTOs.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,28 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var erros = context.ModelState
+           .Where(item => item.Value?.Errors.Count > 0)
+           .SelectMany(item => item.Value!.Errors)
+           .Select(erro => erro.ErrorMessage)
+           .ToList();
+
+        var resposta = new ErroValidacaoResponseDto
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            Mensagem = "Um ou mais erros de validação ocorreram.",
+            Erros = erros
+        };
+
+        return new BadRequestObjectResult(resposta);
+    };
+});
+
 
 builder.Services.AddSingleton<SqlConnectionFactory>();
 

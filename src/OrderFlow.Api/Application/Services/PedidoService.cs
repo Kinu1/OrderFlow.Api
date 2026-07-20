@@ -1,6 +1,8 @@
+using OrderFlow.Api.Application.DTOs.Common;
 using OrderFlow.Api.Application.DTOs.Pedidos;
 using OrderFlow.Api.Application.Interfaces;
 using OrderFlow.Api.Domain.Entities;
+using OrderFlow.Api.Domain.Enums;
 
 namespace OrderFlow.Api.Application.Services;
 
@@ -13,9 +15,31 @@ public class PedidoService
         _pedidoRepository = pedidoRepository;
     }
 
-    public async Task<List<PedidoResumoDto>> ListarAsync()
+    public async Task<PagedRespondeDto<PedidoResumoDto>> ListarAsync(
+    int? clienteId,
+    StatusPedido? status,
+    int page,
+    int pageSize)
     {
-        return await _pedidoRepository.ListarAsync();
+        if (clienteId.HasValue && clienteId.Value <= 0)
+            throw new ArgumentException("O ID do cliente deve ser maior que zero.");
+
+        if (page <= 0)
+            throw new ArgumentException("A página deve ser maior que zero.");
+
+        if (pageSize <= 0)
+            throw new ArgumentException("O tamanho da página deve ser maior que zero.");
+
+        if (pageSize > 100)
+            throw new ArgumentException("O tamanho da página não pode ser maior que 100.");
+
+        return await _pedidoRepository.ListarAsync(
+            clienteId,
+            status,
+            page,
+            pageSize
+        );
+
     }
 
     public async Task<int> CriarAsync(CriarPedidoDto dto)
