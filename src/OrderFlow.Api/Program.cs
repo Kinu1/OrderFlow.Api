@@ -3,10 +3,16 @@ using OrderFlow.Api.Application.Services;
 using OrderFlow.Api.Infrastructure.Data;
 using OrderFlow.Api.Infrastructure.Repositories;
 using OrderFlow.Api.Middlewares;
+using System.Text.Json.Serialization;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddSingleton<SqlConnectionFactory>();
 
@@ -20,7 +26,13 @@ builder.Services.AddScoped<PedidoService>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 

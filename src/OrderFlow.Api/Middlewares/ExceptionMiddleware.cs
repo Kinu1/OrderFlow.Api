@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.Data.SqlClient;
+using OrderFlow.Api.Application.DTOs.Common;
 
 namespace OrderFlow.Api.Middlewares;
 
@@ -82,7 +83,6 @@ public class ExceptionMiddleware
 
             _ => HttpStatusCode.InternalServerError
         };
-
     }
 
     private static async Task HandleExceptionAsync(
@@ -93,10 +93,10 @@ public class ExceptionMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        var resposta = new
+        var resposta = new ErroResponseDto
         {
-            statusCode = context.Response.StatusCode,
-            mensagem
+            StatusCode = context.Response.StatusCode,
+            Mensagem = mensagem
         };
 
         await context.Response.WriteAsJsonAsync(resposta);
