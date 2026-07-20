@@ -3,10 +3,15 @@ using OrderFlow.Api.Application.Services;
 using OrderFlow.Api.Infrastructure.Data;
 using OrderFlow.Api.Infrastructure.Repositories;
 using OrderFlow.Api.Middlewares;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddSingleton<SqlConnectionFactory>();
 
