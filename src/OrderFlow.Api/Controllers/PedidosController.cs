@@ -38,19 +38,28 @@ public class PedidosController : ControllerBase
     }
 
     /// <summary>
-    /// Lista pedidos cadastrados, com filtros opcionais.
+    /// Lista pedidos cadastrados, com filtros opcionais e paginação.
     /// </summary>
     /// <param name="clienteId">Filtra os pedidos por cliente.</param>
     /// <param name="status">Filtra os pedidos por status: Pendente, Confirmado ou Cancelado.</param>
-    /// <returns>Lista resumida de pedidos.</returns>
+    /// <param name="page">Número da página.</param>
+    /// <param name="pageSize">Quantidade de registros por página.</param>
+    /// <returns>Lista paginada de pedidos.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Listar(
         [FromQuery] int? clienteId,
-        [FromQuery] StatusPedido? status)
+        [FromQuery] StatusPedido? status,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        var pedidos = await _pedidoService.ListarAsync(clienteId, status);
+        var pedidos = await _pedidoService.ListarAsync(
+            clienteId,
+            status,
+            page,
+            pageSize
+        );
 
         return Ok(pedidos);
 

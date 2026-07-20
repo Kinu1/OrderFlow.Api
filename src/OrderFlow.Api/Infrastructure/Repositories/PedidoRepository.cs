@@ -1,10 +1,12 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
+using OrderFlow.Api.Application.DTOs.Common;
 using OrderFlow.Api.Application.DTOs.Pedidos;
 using OrderFlow.Api.Application.Interfaces;
 using OrderFlow.Api.Domain.Entities;
 using OrderFlow.Api.Domain.Enums;
 using OrderFlow.Api.Infrastructure.Data;
+
 
 namespace OrderFlow.Api.Infrastructure.Repositories;
 
@@ -95,7 +97,11 @@ public class PedidoRepository : IPedidoRepository
         return tabela;
     }
 
-    public async Task<List<PedidoResumoDto>> ListarAsync(int? clienteId, StatusPedido? status)
+    public async Task<PagedRespondeDto<PedidoResumoDto>> ListarAsync(
+    int? clienteId,
+    StatusPedido? status,
+    int page,
+    int pageSize)
     {
         var pedidos = new List<PedidoResumoDto>();
 
@@ -114,6 +120,9 @@ public class PedidoRepository : IPedidoRepository
             status.HasValue ? (int)status.Value : DBNull.Value
         );
 
+        comando.Parameters.AddWithValue("@Page", page);
+        comando.Parameters.AddWithValue("@PageSize", pageSize);
+
         await conexao.OpenAsync();
 
         await using var reader = await comando.ExecuteReaderAsync();
@@ -131,7 +140,25 @@ public class PedidoRepository : IPedidoRepository
             });
         }
 
-        return pedidos;
+        var totalItems = 0;
+
+        await reader.NextResultAsync();
+
+        if (await reader.ReadAsync())
+        {
+            totalItems = reader.GetInt32(reader.GetOrdinal("TotalItems"));
+        }
+
+        var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+        return new PagedRespondeDto<PedidoResumoDto>
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = totalItems,
+            TotalPages = totalPages,
+            Items = pedidos
+        };
 
     }
 
