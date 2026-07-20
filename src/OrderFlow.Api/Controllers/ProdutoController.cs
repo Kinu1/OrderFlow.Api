@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Application.DTOs.Produtos;
 using OrderFlow.Api.Application.Services;
+using OrderFlow.Api.Application.DTOs.Common;
 
 namespace OrderFlow.Api.Controllers;
 
@@ -22,7 +23,7 @@ public class ProdutosController : ControllerBase
     /// <returns>ID do produto criado.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Criar(CriarProdutoDto dto)
     {
         var id = await _produtoService.CriarAsync(dto);
@@ -50,18 +51,18 @@ public class ProdutosController : ControllerBase
     /// <returns>Dados do produto.</returns>
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(int id)
     {
         var produto = await _produtoService.ObterPorIdAsync(id);
 
         if (produto is null)
         {
-            return NotFound(new
+            return NotFound(new ErroResponseDto
             {
-                statusCode = 404,
-                mensagem = "Produto não encontrado."
+                StatusCode = 404,
+                Mensagem = "Produto não encontrado."
             });
         }
 
@@ -75,18 +76,18 @@ public class ProdutosController : ControllerBase
     /// <param name="dto">Novos dados do produto.</param>
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto),StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Atualizar(int id, CriarProdutoDto dto)
     {
         var atualizado = await _produtoService.AtualizarAsync(id, dto);
 
         if (!atualizado)
         {
-            return NotFound(new
+            return NotFound(new ErroResponseDto
             {
-                statusCode = 404,
-                mensagem = "Produto não encontrado."
+                StatusCode = 404,
+                Mensagem = "Produto não encontrado."
             });
         }
 
@@ -102,18 +103,18 @@ public class ProdutosController : ControllerBase
     /// <param name="id">ID do produto.</param>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Desativar(int id)
     {
         var desativado = await _produtoService.DesativarAsync(id);
 
         if (!desativado)
         {
-            return NotFound(new
+            return NotFound(new ErroResponseDto
             {
-                statusCode = 404,
-                mensagem = "Produto não encontrado."
+                StatusCode = 404,
+                Mensagem = "Produto não encontrado."
             });
         }
 

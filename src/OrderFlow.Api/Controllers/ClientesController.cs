@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Application.DTOs.Clientes;
 using OrderFlow.Api.Application.Services;
+using OrderFlow.Api.Application.DTOs.Common;
 
 namespace OrderFlow.Api.Controllers;
 
@@ -22,7 +23,7 @@ public class ClientesController : ControllerBase
     /// <returns>ID do cliente criado.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Criar(CriarClienteDto dto)
     {
         var id = await _clienteService.CriarAsync(dto);
@@ -50,18 +51,18 @@ public class ClientesController : ControllerBase
     /// <returns>Dados do cliente.</returns>
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(int id)
     {
         var cliente = await _clienteService.ObterPorIdAsync(id);
 
         if (cliente is null)
         {
-            return NotFound(new
+            return NotFound(new ErroResponseDto
             {
-                statusCode = 404,
-                mensagem = "Cliente não encontrado."
+                StatusCode = 404,
+                Mensagem = "Cliente não encontrado."
             });
         }
 
@@ -75,18 +76,18 @@ public class ClientesController : ControllerBase
     /// <param name="dto">Novos dados do cliente.</param>
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Atualizar(int id, CriarClienteDto dto)
     {
         var atualizado = await _clienteService.AtualizarAsync(id, dto);
 
         if (!atualizado)
         {
-            return NotFound(new
+            return NotFound(new ErroResponseDto
             {
-                statusCode = 404,
-                mensagem = "Cliente não encontrado."
+                StatusCode = 404,
+                Mensagem = "Cliente não encontrado."
             });
         }
 
@@ -99,18 +100,18 @@ public class ClientesController : ControllerBase
     /// <param name="id">ID do cliente.</param>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Excluir(int id)
     {
         var excluido = await _clienteService.ExcluirAsync(id);
 
         if (!excluido)
         {
-            return NotFound(new
+            return NotFound(new ErroResponseDto
             {
-                statusCode = 404,
-                mensagem = "Cliente não encontrado."
+                StatusCode = 404,
+                Mensagem = "Cliente não encontrado."
             });
         }
 

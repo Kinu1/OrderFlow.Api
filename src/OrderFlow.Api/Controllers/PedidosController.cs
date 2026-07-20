@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OrderFlow.Api.Application.DTOs.Common;
 using OrderFlow.Api.Application.DTOs.Pedidos;
 using OrderFlow.Api.Application.Services;
 
@@ -26,8 +27,8 @@ public class PedidosController : ControllerBase
     /// <returns>ID do pedido criado.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Criar(CriarPedidoDto dto)
     {
         var id = await _pedidoService.CriarAsync(dto);
@@ -55,18 +56,18 @@ public class PedidosController : ControllerBase
     /// <returns>Pedido com seus respectivos itens.</returns>
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(int id)
     {
         var pedido = await _pedidoService.ObterPorIdAsync(id);
 
         if (pedido is null)
         {
-            return NotFound(new
+            return NotFound(new ErroResponseDto
             {
-                statusCode = 404,
-                mensagem = "Pedido não encontrado."
+                StatusCode = 404,
+                Mensagem = "Pedido não encontrado."
             });
         }
 
@@ -82,8 +83,8 @@ public class PedidosController : ControllerBase
     /// <param name="id">ID do pedido.</param>
     [HttpPut("{id:int}/cancelar")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Cancelar(int id)
     {
         await _pedidoService.CancelarAsync(id);
@@ -100,8 +101,8 @@ public class PedidosController : ControllerBase
     /// <param name="id">ID do pedido.</param>
     [HttpPut("{id:int}/confirmar")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Confirmar(int id)
     {
         await _pedidoService.ConfirmarAsync(id);
