@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrderFlow.Api.Application.DTOs.Common;
 using OrderFlow.Api.Application.DTOs.Pedidos;
 using OrderFlow.Api.Application.Services;
+using OrderFlow.Api.Domain.Enums;
 
 namespace OrderFlow.Api.Controllers;
 
@@ -37,16 +38,22 @@ public class PedidosController : ControllerBase
     }
 
     /// <summary>
-    /// Lista todos os pedidos cadastrados.
+    /// Lista pedidos cadastrados, com filtros opcionais.
     /// </summary>
+    /// <param name="clienteId">Filtra os pedidos por cliente.</param>
+    /// <param name="status">Filtra os pedidos por status: Pendente, Confirmado ou Cancelado.</param>
     /// <returns>Lista resumida de pedidos.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Listar()
+    [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Listar(
+        [FromQuery] int? clienteId,
+        [FromQuery] StatusPedido? status)
     {
-        var pedidos = await _pedidoService.ListarAsync();
+        var pedidos = await _pedidoService.ListarAsync(clienteId, status);
 
         return Ok(pedidos);
+
     }
 
     /// <summary>

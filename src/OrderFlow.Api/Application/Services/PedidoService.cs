@@ -1,6 +1,7 @@
 using OrderFlow.Api.Application.DTOs.Pedidos;
 using OrderFlow.Api.Application.Interfaces;
 using OrderFlow.Api.Domain.Entities;
+using OrderFlow.Api.Domain.Enums;
 
 namespace OrderFlow.Api.Application.Services;
 
@@ -13,9 +14,13 @@ public class PedidoService
         _pedidoRepository = pedidoRepository;
     }
 
-    public async Task<List<PedidoResumoDto>> ListarAsync()
+    public async Task<List<PedidoResumoDto>> ListarAsync(int? clienteId, StatusPedido? status)
     {
-        return await _pedidoRepository.ListarAsync();
+        if (clienteId.HasValue && clienteId.Value <= 0)
+            throw new ArgumentException("O ID do cliente deve ser maior que zero.");
+
+        return await _pedidoRepository.ListarAsync(clienteId, status);
+
     }
 
     public async Task<int> CriarAsync(CriarPedidoDto dto)

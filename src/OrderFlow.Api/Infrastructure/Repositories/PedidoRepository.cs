@@ -95,7 +95,7 @@ public class PedidoRepository : IPedidoRepository
         return tabela;
     }
 
-    public async Task<List<PedidoResumoDto>> ListarAsync()
+    public async Task<List<PedidoResumoDto>> ListarAsync(int? clienteId, StatusPedido? status)
     {
         var pedidos = new List<PedidoResumoDto>();
 
@@ -103,6 +103,16 @@ public class PedidoRepository : IPedidoRepository
 
         await using var comando = new SqlCommand("Pedido_Listar", conexao);
         comando.CommandType = CommandType.StoredProcedure;
+
+        comando.Parameters.AddWithValue(
+            "@ClienteId",
+            clienteId.HasValue ? clienteId.Value : DBNull.Value
+        );
+
+        comando.Parameters.AddWithValue(
+            "@Status",
+            status.HasValue ? (int)status.Value : DBNull.Value
+        );
 
         await conexao.OpenAsync();
 
@@ -122,6 +132,7 @@ public class PedidoRepository : IPedidoRepository
         }
 
         return pedidos;
+
     }
 
     public async Task<bool> CancelarAsync(int id)
