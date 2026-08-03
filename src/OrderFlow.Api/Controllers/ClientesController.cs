@@ -78,7 +78,7 @@ public class ClientesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Atualizar(int id, CriarClienteDto dto)
+    public async Task<IActionResult> Atualizar(int id, AtualizarClienteDto dto)
     {
         var atualizado = await _clienteService.AtualizarAsync(id, dto);
 

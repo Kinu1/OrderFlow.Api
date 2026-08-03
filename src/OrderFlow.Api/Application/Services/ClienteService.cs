@@ -66,7 +66,7 @@ public class ClienteService
         };
     }
 
-    public async Task<bool> AtualizarAsync(int id, CriarClienteDto dto)
+    public async Task<bool> AtualizarAsync(int id, AtualizarClienteDto dto)
     {
         if (id <= 0)
             throw new ArgumentException("O ID do cliente deve ser maior que zero.");

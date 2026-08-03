@@ -74,7 +74,7 @@ public class ProdutoService
         };
     }
 
-    public async Task<bool> AtualizarAsync(int id, CriarProdutoDto dto)
+    public async Task<bool> AtualizarAsync(int id, AtualizarProdutoDto dto)
     {
         if (id <= 0)
             throw new ArgumentException("O ID do produto deve ser maior que zero.");

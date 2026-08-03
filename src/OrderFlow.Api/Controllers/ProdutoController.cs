@@ -78,7 +78,7 @@ public class ProdutosController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErroResponseDto),StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErroResponseDto), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Atualizar(int id, CriarProdutoDto dto)
+    public async Task<IActionResult> Atualizar(int id, AtualizarProdutoDto dto)
     {
         var atualizado = await _produtoService.AtualizarAsync(id, dto);
 
