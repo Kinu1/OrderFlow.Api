@@ -1,74 +1,123 @@
-using Xunit;
 using Moq;
+using OrderFlow.Api.Application.DTOs.Clientes;
 using OrderFlow.Api.Application.Interfaces;
 using OrderFlow.Api.Application.Services;
 using OrderFlow.Api.Domain.Entities;
+using Xunit;
 
 namespace OrderFlow.Api.Tests.Services;
 
 public class ClienteServiceTests
 {
     [Fact]
-    public async Task ObterPorIdAsync_DeveRetornarCliente_QuandoClienteExistir()
+    public async Task CriarAsync_DeveLancarExcecao_QuandoNomeEstiverVazio()
     {
         var repositoryMock = new Mock<IClienteRepository>();
+        var service = new ClienteService(repositoryMock.Object);
 
-        var cliente = new Cliente
+        var dto = new CriarClienteDto
         {
-            Id = 1,
-            Nome = "Pedro",
+            Nome = "",
             Email = "pedro@email.com",
-            Telefone = "11999999999"
+            Telefone = "21999999999"
         };
 
-        repositoryMock
-            .Setup(r => r.ObterPorIdAsync(1))
-            .ReturnsAsync(cliente);
+        var acao = async () => await service.CriarAsync(dto);
 
-        var service = new ClienteService(repositoryMock.Object);
+        var excecao = await Assert.ThrowsAsync<ArgumentException>(acao);
 
-        var resultado = await service.ObterPorIdAsync(1);
-
-        Assert.NotNull(resultado);
-        Assert.Equal(1, resultado.Id);
-        Assert.Equal("Pedro", resultado.Nome);
-        Assert.Equal("pedro@email.com", resultado.Email);
-
+        Assert.Equal("O nome do cliente é obrigatório.", excecao.Message);
     }
 
     [Fact]
-    public async Task ObterPorIdAsync_DeveLancarExecao_QuandoClienteNaoExistir()
+    public async Task CriarAsync_DeveRetornarId_QuandoClienteForValido()
     {
         var repositoryMock = new Mock<IClienteRepository>();
 
         repositoryMock
-            .Setup(r => r.ObterPorIdAsync(1))
-            .ReturnsAsync((Cliente?)null);
+            .Setup(repository => repository.CriarAsync(It.IsAny<Cliente>()))
+            .ReturnsAsync(1);
 
         var service = new ClienteService(repositoryMock.Object);
-
-        await Assert.ThrowsAsync<Exeception>(() =>
-            service.ObterPorIdAsync(1));
-    }
-
-    [Fact]
-    public async Task CriarAsync_DeveChamarRepository_QuandoDadosForemValidos()
-    {
-        var repositoryMock = new Mock<IClienteRepository>();
 
         var dto = new CriarClienteDto
         {
             Nome = "Pedro",
             Email = "pedro@email.com",
-            Telefone = "11999999999"
+            Telefone = "21999999999"
         };
+
+        var IdCriado = await service.CriarAsync(dto);
+
+        Assert.Equal(1, IdCriado);
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveEnviarDadosSemEspacosAoRepositorio_QuandoClienteForValido()
+    {
+        var repositoryMock = new Mock<IClienteRepository>();
+
+        repositoryMock
+               .Setup(repository => repository.CriarAsync(It.IsAny<Cliente>()))
+               .ReturnsAsync(1);
 
         var service = new ClienteService(repositoryMock.Object);
 
-        await service.CriarAsync(dto);
-        repositoryMock.Verify(
-            r => r.CriarAsync(It.IsAny<Cliente>()),
-            Times.Once);
-    }   
+        var dto = new CriarClienteDto
+        {
+            Nome = "  Pedro   ",
+            Email = "   pedro@email.com   ",
+            Telefone = "    21999999999  "
+        };
 
+        await service.CriarAsync(dto);
+
+        repositoryMock.Verify(
+            repositoryMock => repositoryMock.CriarAsync(
+                It.Is<Cliente>(Cliente =>
+                    Cliente.Nome == "Pedro" &&
+                    Cliente.Email == "pedro@email.com" &&
+                    Cliente.Telefone == "2199999999")),
+                Times.Once);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-10)]
+    public async Task ObterPorIdAsync_DeveLancarExcecao_QuandoIdNaoForPositivo(int id)
+    {
+        var repositoryMock = new Mock<IClienteRepository>();
+        var service = new ClienteService(repositoryMock.Object);
+
+        var acao = async () => await service.ObterPorIdAsync(id);
+
+        var excecao = await Assert.ThrowsAsync<ArgumentException>(acao);
+
+        Assert.Equal("O ID do cliente deve ser maior que zero.", excecao.Message);
+
+        repositoryMock.Verify(
+        repository => repository.ObterPorIdAsync(It.IsAny<int>()),
+        Times.Never);
+    }
+
+    [Fact]
+    public async Task ObterPorIdAsync_DeveRetornarNull_QuandoClienteNãoForEncontrado()
+    {
+        var repositoryMock = new Mock<IClienteRepository>();
+
+        repositoryMock
+            .Setup(repository => repository.ObterPorIdAsync(10))
+            .ReturnsAsync((Cliente?)null);
+
+        var service = new ClienteService(repositoryMock.Object);
+
+        var resultado = await service.ObterPorIdAsync(10);
+
+        Assert.Null(resultado);
+
+        repositoryMock.Verify(
+            repository => repository.ObterPorIdAsync(10),
+            Times.Once);
+    }
 }
