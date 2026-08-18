@@ -9,6 +9,38 @@ namespace OrderFlow.Api.Tests.Services;
 
 public class ClienteServiceTests
 {
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("     ")]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoEmailForInvalido(string emailInvalido)
+    {
+        var repositoryMock = new Mock<IClienteRepository>();
+        var service = new ClienteService(repositoryMock.Object);
+
+        var dto = new CriarClienteDto
+        {
+            Nome = "Pedro",
+            Email = emailInvalido,
+            Telefone = "21999999999"
+        };
+
+        var acao = async () => await service.CriarAsync(dto);
+
+        var excecao =
+            await Assert.ThrowsAsync<ArgumentException>(acao);
+
+        Assert.Equal(
+            "O e-mail do cliente é obrigatório.",
+            excecao.Message);
+
+        repositoryMock.Verify(
+            repository =>
+                repository.CriarAsync(It.IsAny<Cliente>()),
+            Times.Never);
+
+    }
+
     [Fact]
     public async Task CriarAsync_DeveLancarExcecao_QuandoNomeEstiverVazio()
     {
@@ -27,6 +59,10 @@ public class ClienteServiceTests
         var excecao = await Assert.ThrowsAsync<ArgumentException>(acao);
 
         Assert.Equal("O nome do cliente é obrigatório.", excecao.Message);
+
+        repositoryMock.Verify(
+            repository => repository.CriarAsync(It.IsAny<Cliente>()),
+            Times.Never);
     }
 
     [Fact]
